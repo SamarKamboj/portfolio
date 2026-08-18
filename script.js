@@ -1,75 +1,96 @@
 document.addEventListener('DOMContentLoaded', () => {
     // --- Theme Toggle Logic ---
-    const themeToggleBtn = document.getElementById('theme-toggle');
+    const themeToggles = document.querySelectorAll('.theme-toggle');
     const htmlElement = document.documentElement;
-    
-    // Check local storage for theme preference, default to dark
-    const savedTheme = localStorage.getItem('theme') || 'dark';
-    htmlElement.setAttribute('data-theme', savedTheme);
 
-    themeToggleBtn.addEventListener('click', () => {
-        const currentTheme = htmlElement.getAttribute('data-theme');
-        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
-        htmlElement.setAttribute('data-theme', newTheme);
-        localStorage.setItem('theme', newTheme);
+    function getInitialTheme() {
+        const saved = localStorage.getItem('theme');
+        if (saved) return saved;
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+            return 'light';
+        }
+        return 'dark';
+    }
+
+    function setTheme(theme) {
+        htmlElement.setAttribute('data-theme', theme);
+        localStorage.setItem('theme', theme);
+    }
+
+    function toggleTheme() {
+        const current = htmlElement.getAttribute('data-theme');
+        setTheme(current === 'dark' ? 'light' : 'dark');
+    }
+
+    // Initialize theme
+    setTheme(getInitialTheme());
+
+    // Add listeners to all toggle buttons
+    themeToggles.forEach(btn => {
+        btn.addEventListener('click', toggleTheme);
     });
+
+    // Listen to system preference changes (only when no manual override)
+    if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                setTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    }
 
     // --- Mobile Menu Toggle ---
     const menuToggleBtn = document.querySelector('.menu-toggle');
     const mobileMenu = document.querySelector('.mobile-menu');
-    const mobileMenuLinks = document.querySelectorAll('.mobile-menu a');
 
-    menuToggleBtn.addEventListener('click', () => {
-        mobileMenu.classList.toggle('open');
-    });
-
-    // Close mobile menu when a link is clicked
-    mobileMenuLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            mobileMenu.classList.remove('open');
+    if (menuToggleBtn && mobileMenu) {
+        menuToggleBtn.addEventListener('click', () => {
+            mobileMenu.classList.toggle('open');
         });
-    });
+
+        // Close mobile menu when a link is clicked
+        mobileMenu.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('open');
+            });
+        });
+    }
 
     // --- Set current year in footer ---
-    document.getElementById('year').textContent = new Date().getFullYear();
+    const yearEl = document.getElementById('year');
+    if (yearEl) {
+        yearEl.textContent = new Date().getFullYear();
+    }
 
     // --- Scroll Reveal Animation ---
     const revealElements = document.querySelectorAll('.reveal');
-    
-    const revealCallback = (entries, observer) => {
+
+    const revealCallback = (entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 entry.target.classList.add('active');
-                // Optional: Stop observing once revealed
-                // observer.unobserve(entry.target);
             }
         });
     };
 
     const revealOptions = {
-        threshold: 0.1, // Trigger when 10% of element is visible
-        rootMargin: "0px 0px -50px 0px" // Trigger slightly before it comes into view
+        threshold: 0.1,
+        rootMargin: "0px 0px -50px 0px"
     };
 
     const revealObserver = new IntersectionObserver(revealCallback, revealOptions);
-    
-    revealElements.forEach(el => {
-        revealObserver.observe(el);
-    });
+    revealElements.forEach(el => revealObserver.observe(el));
 
     // --- Active Nav Link Highlighting ---
-    const sections = document.querySelectorAll('section');
-    const navLinks = document.querySelectorAll('.nav-links a');
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.nav-links .nav-link');
     const mobileNavLinks = document.querySelectorAll('.mobile-menu a');
 
     window.addEventListener('scroll', () => {
         let current = '';
-        
+
         sections.forEach(section => {
             const sectionTop = section.offsetTop;
-            const sectionHeight = section.clientHeight;
-            // Adjust offset to trigger active state earlier
             if (scrollY >= (sectionTop - 150)) {
                 current = section.getAttribute('id');
             }
@@ -78,7 +99,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const updateLinks = (links) => {
             links.forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
+                const href = link.getAttribute('href');
+                if (href && href.includes(current) && current !== '') {
                     link.classList.add('active');
                 }
             });
