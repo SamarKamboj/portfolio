@@ -122,14 +122,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (cfData.status === 'OK' && cfData.result.length > 0) {
                     const user = cfData.result[0];
                     cfStatsEl.classList.remove('loading');
-                    cfStatsEl.innerHTML = `Rating: <strong>${user.rating || 'Unrated'}</strong> <br> Max: ${user.maxRating || 'Unrated'} (${user.maxRank || 'Unknown'})`;
+                    cfStatsEl.innerHTML = `
+                        <div class="code-line"><span class="syntax-keyword">rating</span> = <span class="syntax-number">${user.rating || 'Unrated'}</span></div>
+                        <div class="code-line"><span class="syntax-keyword">max_rating</span> = <span class="syntax-number">${user.maxRating || 'Unrated'}</span></div>
+                        <div class="code-line"><span class="syntax-keyword">max_rank</span> = <span class="syntax-string">"${user.maxRank || 'Unknown'}"</span></div>`;
                 } else {
                     throw new Error('CF API failed');
                 }
             } catch (error) {
                 console.error('Error fetching CF stats:', error);
                 cfStatsEl.classList.remove('loading');
-                cfStatsEl.textContent = 'View Profile →';
+                cfStatsEl.innerHTML = `<div class="code-line"><span class="syntax-keyword">error</span> : <span class="syntax-string">"Click to view profile instead"</span></div>`;
             }
         }
 
@@ -140,14 +143,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 const lcData = await lcRes.json();
                 if (lcData.totalSolved !== undefined) {
                     lcStatsEl.classList.remove('loading');
-                    lcStatsEl.innerHTML = `<strong>${lcData.totalSolved}</strong> Solved <br> ${lcData.easySolved} Easy · ${lcData.mediumSolved} Medium · ${lcData.hardSolved} Hard`;
+                    lcStatsEl.innerHTML = `
+                        <div class="code-line"><span class="syntax-keyword">solved</span> = <span class="syntax-number">${lcData.totalSolved}</span></div>
+                        <div class="code-line"><span class="syntax-keyword">easy</span> = <span class="syntax-number">${lcData.easySolved}</span></div>
+                        <div class="code-line"><span class="syntax-keyword">medium</span> = <span class="syntax-number">${lcData.mediumSolved}</span></div>
+                        <div class="code-line"><span class="syntax-keyword">hard</span> = <span class="syntax-number">${lcData.hardSolved}</span></div>`;
                 } else {
                     throw new Error('LC API missing data');
                 }
             } catch (error) {
                 console.error('Error fetching LC stats:', error);
                 lcStatsEl.classList.remove('loading');
-                lcStatsEl.textContent = 'View Profile →';
+                lcStatsEl.innerHTML = `<div class="code-line"><span class="syntax-keyword">error</span> : <span class="syntax-string">"Click to view profile instead"</span></div>`;
             }
         }
     };

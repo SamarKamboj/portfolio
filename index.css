@@ -88,6 +88,8 @@
   --danger: #ef4444;
   --accent: #f59e0b;
   --accent-foreground: #451a03;
+  --accent-purple: #a855f7;
+  --accent-cyan: #06b6d4;
   --destructive: #ef4444;
   --destructive-foreground: #fff;
   
@@ -141,6 +143,8 @@
   --muted-foreground: #a3a3a3;
   --accent: #f59e0b;
   --accent-foreground: #0a0a0a;
+  --accent-purple: #c084fc;
+  --accent-cyan: #22d3ee;
   --destructive: #ef4444;
   --destructive-foreground: #ededed;
   --border: #606068;
@@ -782,14 +786,55 @@ img {
 }
 
 /* ===================================
-   SKILLS
+   SKILLS BENTO GRID
    =================================== */
-.skill-group {
-  margin-bottom: var(--spacing-lg);
+.skills-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: var(--spacing-lg);
 }
 
-.skill-group:last-child {
-  margin-bottom: 0;
+.skill-card {
+  border-left: 3px solid var(--skill-accent, var(--primary));
+}
+
+.skill-card:nth-child(1) { animation-delay: 0s; }
+.skill-card:nth-child(2) { animation-delay: 0.1s; }
+.skill-card:nth-child(3) { animation-delay: 0.2s; }
+.skill-card:nth-child(4) { animation-delay: 0.3s; }
+
+.skill-var {
+  color: var(--skill-accent, var(--primary));
+  font-weight: 600;
+}
+
+.skill-entries {
+  padding-left: var(--spacing-lg);
+}
+
+.skill-entry {
+  padding: 2px 0;
+  font-size: var(--text-sm);
+}
+
+.skill-key {
+  color: var(--syntax-string);
+}
+
+.skill-level {
+  font-weight: 500;
+}
+
+.skill-level.proficient {
+  color: var(--success);
+}
+
+.skill-level.experienced {
+  color: var(--skill-accent, var(--primary));
+}
+
+.skill-level.familiar {
+  color: var(--text-secondary);
 }
 
 /* ===================================
@@ -822,36 +867,30 @@ img {
 }
 
 /* ===================================
-   STATS / ACHIEVEMENTS
+   STATS BENTO & GIT-LOG TIMELINE
    =================================== */
-.stats-grid {
+.stats-bento {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: var(--spacing-lg);
   margin-bottom: var(--spacing-xl);
-  padding-bottom: var(--spacing-xl);
-  border-bottom: 1px solid var(--border-light);
 }
 
-.stat-item {
+.stat-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.2s ease;
+}
+
+.stat-card .window-content {
   display: flex;
   align-items: center;
   gap: var(--spacing-md);
   padding: var(--spacing-md);
-  background-color: var(--bg-code);
-  border: 1px solid var(--border);
-  border-radius: var(--radius-lg);
-  transition: all 0.2s ease;
-  text-decoration: none;
-  color: inherit;
 }
 
-.stat-item:hover {
-  border-color: var(--primary);
-  transform: translateY(-2px);
-}
-
-.stat-icon {
+.stat-platform-icon {
   width: 48px;
   height: 48px;
   background-color: var(--muted);
@@ -863,67 +902,89 @@ img {
   flex-shrink: 0;
 }
 
-.stat-info h3 {
-  font-size: var(--text-base);
-  font-weight: 600;
-  margin-bottom: var(--spacing-xs);
-}
-
-.stat-data {
+.stat-code {
   font-size: var(--text-sm);
   color: var(--text-secondary);
   line-height: 1.5;
+  width: 100%;
 }
 
-.stat-data strong {
-  color: var(--foreground);
-  font-weight: 600;
-}
-
-.stat-data.loading {
+.stat-code.loading {
   opacity: 0.7;
   animation: pulse 1.5s infinite;
 }
 
-/* ===================================
-   CERTIFICATES
-   =================================== */
-.cert-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--spacing-md);
+.git-log {
+  position: relative;
+  padding: var(--spacing-sm) 0;
 }
 
-.cert-item {
+.git-commit {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
   gap: var(--spacing-md);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--border-light);
+  padding-bottom: var(--spacing-lg);
+  position: relative;
 }
 
-.cert-item:last-child {
-  border-bottom: none;
+.git-commit:last-child {
   padding-bottom: 0;
 }
 
-.cert-name {
+.git-commit:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 14px;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-light);
+}
+
+.git-node {
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  border: 2px solid var(--primary);
+  background: var(--bg-card);
+  flex-shrink: 0;
+  margin-top: 4px;
+  position: relative;
+  z-index: 1;
+}
+
+.git-hash {
+  color: var(--warning);
+  font-size: var(--text-xs);
   font-weight: 600;
-  color: var(--foreground);
-  display: block;
-  font-size: var(--text-sm);
+  margin-right: 8px;
 }
 
-.cert-detail {
-  font-size: var(--text-xs);
-  color: var(--text-secondary);
-}
-
-.cert-date {
-  font-size: var(--text-xs);
+.git-date {
   color: var(--syntax-string);
-  white-space: nowrap;
+  font-size: var(--text-xs);
+}
+
+.git-message {
+  font-weight: 600;
+  font-size: var(--text-sm);
+  color: var(--foreground);
+  margin-top: 2px;
+}
+
+.git-detail {
+  color: var(--text-secondary);
+  font-size: var(--text-xs);
+  margin-top: 2px;
+}
+
+.live-dot {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--success);
+  animation: pulse 2s ease-in-out infinite;
+  margin-right: 4px;
 }
 
 /* ===================================
@@ -1047,16 +1108,12 @@ footer .cmd-prompt {
     object-position: top;
   }
   
-  .stats-grid {
+  .skills-grid,
+  .stats-bento {
     grid-template-columns: 1fr;
   }
   
   .edu-header {
     flex-direction: column;
-  }
-  
-  .cert-item {
-    flex-direction: column;
-    gap: var(--spacing-xs);
   }
 }
